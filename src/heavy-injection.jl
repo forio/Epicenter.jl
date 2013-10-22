@@ -1,6 +1,4 @@
 
-module Mercutio
-
 export loadmodel
 
 type MercutioData
@@ -27,5 +25,3 @@ function loadmodel(model)
     end
 end
 
-
-end

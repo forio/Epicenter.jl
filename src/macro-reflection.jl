@@ -1,4 +1,3 @@
-module Mercutio
 
 export @parameter, @param_str, @some_macro, @recalc
 
@@ -33,17 +32,4 @@ end
 function register(fn)
     println(typeof(fn))
     global reload_fn = fn
-end
-
-end
-
-
-module B
-
-    using Mercutio
-
-    function foo()
-        @some_macro
-    end
-
 end
