@@ -1,21 +1,13 @@
 
 module Mercutio
 
-export Model, runmodel
+export Model
 
-abstract Model
+export getmodel,
+       runmodel,
+       setparam
 
-runmodel(mdl::Model) = error("`runmodel` must be defined for your model")
-
-function setparam(mdl::Model, params...)
-    for param in params
-        mdl.(param[1]) = param[2]
-    end
-end
-
-#include("macro-reflection.jl")
-#include("heavy-injection.jl")
-
+include("model.jl")
 include("persistence.jl")
 
 end
