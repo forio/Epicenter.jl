@@ -5,7 +5,8 @@ importall Base
 
 export Model
 
-export getmodel,
+export register_model,
+       getmodel,
        runmodel,
        setparam
 

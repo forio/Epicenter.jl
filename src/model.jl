@@ -4,11 +4,18 @@ abstract Model
 type ModelData
     mdl::Model
     persist_queue::Dict{Symbol, Vector}
+
+    ModelData(mdl::Model) = new(mdl, Dict{Symbol, Vector}())
 end
 
 global _g_model_data = Dict{Symbol, ModelData}()
 
 # -------
+
+function register_model(mdl_sym::Symbol, mdl::Model)
+    _g_model_data[mdl_sym] = ModelData(mdl)
+end
+
 
 function getmodeldata(sym::Symbol)
     mdl_data = get(_g_model_data, sym, nothing)

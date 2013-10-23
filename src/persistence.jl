@@ -32,13 +32,17 @@ end
 
 
 function push!(mdl_data::ModelData, member::Symbol)
+    if !haskey(mdl_data.persist_queue, member)
+        mdl_data.persist_queue[member] = Any[]
+    end
+
     val = mdl_data.mdl.(member)
     push!(mdl_data.persist_queue[member], val)
 end
 
 function push!(mdl_sym::Symbol, member::Symbol)
     mdl_data = getmodeldata(mdl_sym)
-    save(mdl_data, member)
+    push!(mdl_data, member)
 end
 
 

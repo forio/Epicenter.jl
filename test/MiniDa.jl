@@ -12,9 +12,14 @@ type CalcModel <: Model
 end
 
 function runmodel(mdl::CalcModel)
+    push!(:calc, :price)
+    push!(:calc, :formula)
+
     num_customers = cos(mdl.price / 12) * 64
     num_customers *= mdl.formula / 2.5
 end
+
+register_model(:calc, CalcModel(7.0, 3))
 
 # -------
 
@@ -26,6 +31,7 @@ function runmodel(mdl::ForcastModel)
     likely_customers = (mdl.region / 2.5) * 64
 end
 
+register_model(:forcast, ForcastModel(2))
 
 end
 
