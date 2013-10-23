@@ -3,19 +3,21 @@ abstract Model
 
 type ModelData
     mdl::Model
-    persist_queue::Dict{Symbol, Array}
+    persist_queue::Dict{Symbol, Vector}
 end
 
 global _g_model_data = Dict{Symbol, ModelData}()
 
 # -------
 
-function getmodel(sym::Symbol)
-    mdl = get(_g_model_data, sym, nothing)
-    mdl == nothing && error("no model for symbol: $sym")
+function getmodeldata(sym::Symbol)
+    mdl_data = get(_g_model_data, sym, nothing)
+    mdl_data == nothing && error("no model data for: $sym")
 
-    mdl
+    mdl_data
 end
+
+getmodel(sym::Symbol) = getmodeldata(sym).mdl
 
 
 function runmodel(mdl::Model)

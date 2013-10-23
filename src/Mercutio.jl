@@ -1,6 +1,8 @@
 
 module Mercutio
 
+importall Base
+
 export Model
 
 export getmodel,
