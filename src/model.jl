@@ -16,6 +16,10 @@ function register_model(mdl_sym::Symbol, mdl::Model)
     _g_model_data[mdl_sym] = ModelData(mdl)
 end
 
+function register_model(mdl::Model)
+    register_model(symbol(string(typeof(mdl))), mdl)
+end
+
 
 function getmodeldata(sym::Symbol)
     mdl_data = get(_g_model_data, sym, nothing)
