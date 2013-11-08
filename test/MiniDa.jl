@@ -12,8 +12,8 @@ type CalcModel <: Model
 end
 
 function runmodel(mdl::CalcModel)
-    push!(:calc, :price)
-    push!(:calc, :formula)
+    push!(:CalcModel, :price)
+    push!(:CalcModel, :formula)
 
     num_customers = cos(mdl.price / 12) * 64
     num_customers *= mdl.formula / 2.5
