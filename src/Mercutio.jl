@@ -8,7 +8,8 @@ export Model
 export register_model,
        getmodel,
        runmodel,
-       setparam
+       setparam,
+       popall!
 
 include("model.jl")
 include("persistence.jl")

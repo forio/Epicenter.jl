@@ -22,23 +22,12 @@ function length(mdl_data::ModelData, member::Symbol)
     length(mdl_data.persist_queue[member])
 end
 
-function length(mdl_sym::Symbol, member::Symbol)
-    mdl_data = getmodeldata(mdl_sym)
-    length(mdl_data, member)
-end
+length(mdl_sym::Symbol, member::Symbol) = length(getmodeldata(mdl_sym), member)
 
 length(mdl_data::ModelData) = sum(length, mdl_data.persist_queue)
 
 length(mdl_sym::Symbol) = length(getmodeldata(mdl_sym))
 
-
-function empty!(mdl_data::ModelData)
-    for (sym, queue) in mdl_data.persist_queue
-        empty!(queue)
-    end
-
-    mdl_data
-end
 
 function empty!(mdl_data::ModelData, member::Symbol)
     empty!(mdl_data.persist_queue[member])
@@ -48,6 +37,16 @@ function empty!(mdl_sym::Symbol, member::Symbol)
     mdl_data = getmodeldata(mdl_sym)
     empty!(mdl_data, member)
 end
+
+function empty!(mdl_data::ModelData)
+    for (sym, queue) in mdl_data.persist_queue
+        empty!(queue)
+    end
+
+    mdl_data
+end
+
+empty!(mdl_sym::Symbol) = empty!(getmodeldata(mdl_sym))
 
 
 function push!(mdl_data::ModelData, member::Symbol)
@@ -82,15 +81,17 @@ function pop!(mdl_sym::Symbol, member::Symbol)
     pop!(mdl_data, member)
 end
 
+pop!(mdl_sym::Symbol) = pop!(getmodeldata(mdl_sym))
+
+
 function popall!(mdl_data::ModelData)
-    out = Any[]
-    for (sym, queue) in mdl_data.persist_queue
-        push!(out, queue)
-        empty!(queue)
-    end
+    out = deepcopy(mdl_data.persist_queue)
+    empty!(mdl_data.persist_queue)
 
     out
 end
+
+popall!(mdl_sym::Symbol) = popall!(getmodeldata(mdl_sym))
 
 
 function splice!(mdl_data::ModelData, member::Symbol, ir, ins::AbstractArray = Base._default_splice)
