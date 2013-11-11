@@ -23,15 +23,15 @@ register_model(CalcModel(7.0, 3))
 
 # -------
 
-type ForcastModel <: Model
+type ForecastModel <: Model
     region::Int  # in range [1, 4]
 end
 
-function runmodel(mdl::ForcastModel)
+function runmodel(mdl::ForecastModel)
     likely_customers = (mdl.region / 2.5) * 64
 end
 
-register_model(ForcastModel(2))
+register_model(ForecastModel(2))
 
 end
 
