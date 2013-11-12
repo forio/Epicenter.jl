@@ -106,7 +106,7 @@ pop!(mdl_sym::Symbol)                 => [:member, val]
 
 ```julia
 # pop everything from a models queue => { :member1 => [val1, val2]
-                                          :member2 => [val1, val2, val3] }
+#                                         :member2 => [val1, val2, val3] }
 popall!(mdl_sym::Symbol)
 ```
 
