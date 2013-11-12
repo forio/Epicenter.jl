@@ -8,11 +8,11 @@ import Mercutio.runmodel
 
 type SwimTrunkSalesModel <: Model
     price::Float64
-    color::Int
+    color::Int  # [1, 4] for simplicity, there are 4 colors of fabric
 
     num_customers
 
-    SwimTrunkSalesModel(price = 16, color = 1) = new(price, color, 0)
+    SwimTrunkSalesModel(price = 16.0, color = 1) = new(price, color, 0)
 end
 
 function runmodel(mdl::SwimTrunkSalesModel)

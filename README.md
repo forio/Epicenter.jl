@@ -1,4 +1,4 @@
-### A Julia package for writing models and simulations
+## A Julia package for writing models and simulations
 
 Don't let him near Tybalt, they have a history.
 
@@ -11,23 +11,23 @@ Inherit from the abstract `Mercutio.Model` type and declare members that will be
 ```
 type SwimTrunkSalesModel <: Model
     price::Float64
-    color::Int
+    color::Int  # [1, 4] for simplicity, there are 4 colors of fabric
 
     num_customers
 
-    SwimTrunkSalesModel(price = 16, color = 1) = new(price, color, 0)
+    SwimTrunkSalesModel(price = 16.0, color = 1) = new(price, color, 0)
 end
 ```
 
 In this case we're trying to figure out how well our swim trucks will sell. We've got a model with two data members that we can play with, `price` and `color`. We've also got a member `num_customers`, which we will calculate. To start using our model, let's resiter it with Mercutio.
 
 ```
-using Mercutio
+julia> using Mercutio
 
-register_model(SwimTruckSales())
+julia> register_model(SwimTruckSales())
 
 # now we can do cool things like change price and color
-setparam(:SwimTrunkSales, [:price, 7], [:color, :red])
+julia> setparam(:SwimTrunkSales, [:price, 7], [:color, 3])
 ```
 
 
@@ -77,3 +77,5 @@ julia> runmodel(:SwimTrunkSalesModel)
 
 
 #### Accessing persisted values
+
+Now that we've run our model a couple times, we've generated some data. 
