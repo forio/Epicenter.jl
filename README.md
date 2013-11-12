@@ -19,7 +19,7 @@ type SwimTruckSales <: Model
 end
 ```
 
-In this case we're trying to figure out how well our swim trucks will sell. We've got a model with two data members that we can play with, `price` and `color`. To start using our model, let's resiter one with Mercutio.
+In this case we're trying to figure out how well our swim trucks will sell. We've got a model with two data members that we can play with, `price` and `color`. We've also got a member `num_customers` which we will calculate. To start using our model, let's resiter it with Mercutio.
 
 ```
 using Mercutio
