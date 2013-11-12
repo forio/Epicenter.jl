@@ -78,4 +78,39 @@ julia> runmodel(:SwimTrunkSalesModel)
 
 #### Accessing persisted values
 
-Now that we've run our model a couple times, we've generated some data. 
+Now that we've run our model a couple times, we've generated some data. The API for accessing it is as follows:
+
+```
+# is there data to persist => true | false
+isempty(mdl_sym::Symbol, member::Symbol)
+isempty(mdl_sym::Symbol)
+```
+
+```
+# how many values are queued => Int
+length(mdl_sym::Symbol, member::Symbol)
+length(mdl_sym::Symbol)
+```
+
+```
+# flush everything from the queue => nothing
+empty!(mdl_sym::Symbol, member::Symbol)
+empty!(mdl_sym::Symbol)
+```
+
+```
+# pop a single thing from the queue
+pop!(mdl_sym::Symbol, member::Symbol) => val
+pop!(mdl_sym::Symbol)                 => [:member, val]
+```
+
+```
+# pop everything from a models queue => { :member1 => [val1, val2]
+                                          :member2 => [val1, val2, val3] }
+popall!(mdl_sym::Symbol)
+```
+
+```
+# splice out an element or a range from a queue
+splice!(mdl_sym::Symbol, member::Symbol, ir, ins::AbstractArray = Base._default_splice)
+```
