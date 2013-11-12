@@ -21,12 +21,18 @@ function register_model(mdl::Model)
 end
 
 
+function registered_models()
+    [ mdl_sym for (mdl_sym, mdl) in _g_model_data ]
+end
+
+
 function getmodeldata(sym::Symbol)
     mdl_data = get(_g_model_data, sym, nothing)
     mdl_data == nothing && error("no model data for: $sym")
 
     mdl_data
 end
+
 
 getmodel(sym::Symbol) = getmodeldata(sym).mdl
 

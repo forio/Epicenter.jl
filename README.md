@@ -114,3 +114,20 @@ popall!(mdl_sym::Symbol)
 # splice out an element or a range from a queue
 splice!(mdl_sym::Symbol, member::Symbol, ir, ins::AbstractArray = Base._default_splice)
 ```
+
+
+#### Other useful methods
+
+```
+# list names of all registered models => [:model1, :model2, :model3]
+registered_models()
+```
+
+```
+# get the model registered for a symbol => Model
+getmodel(model::Symbol)
+```
+
+```
+
+```
