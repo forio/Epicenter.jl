@@ -91,6 +91,10 @@ function popall!(mdl_data::ModelData)
     out
 end
 
+function popall!()
+    { mdl_sym => deepcopy(mdl_data.persist_queue) for (mdl_sym, mdl_data) in _g_model_data }
+end
+
 popall!(mdl_sym::Symbol) = popall!(getmodeldata(mdl_sym))
 
 
