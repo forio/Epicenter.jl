@@ -100,8 +100,8 @@ empty!(mdl_sym::Symbol)
 
 ```julia
 # pop a single thing from the queue
-pop!(mdl_sym::Symbol, member::Symbol) => val
-pop!(mdl_sym::Symbol)                 => [:member, val]
+pop!(mdl_sym::Symbol, member::Symbol) # => val
+pop!(mdl_sym::Symbol)                 # => [:member, val]
 ```
 
 ```julia
