@@ -66,7 +66,7 @@ end
 
 function pop!(mdl_data::ModelData)
     for (sym, queue) in mdl_data.persist_queue
-        !isempty(queue) && return pop!(queue)
+        !isempty(queue) && return [sym, pop!(queue)]
     end
 
     error("model queue is empty")
