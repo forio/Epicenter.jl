@@ -76,7 +76,7 @@ julia> runmodel(:SwimTrunkSalesModel)
 ```
 
 
-#### Accessing persisted values
+#### Access persisted values
 
 Now that we've run our model a couple times, we've generated some data. The API for accessing it is as follows:
 
