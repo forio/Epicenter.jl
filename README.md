@@ -9,13 +9,13 @@ Don't let him near Tybalt, they have a history.
 Inherit from the abstract `Mercutio.Model` type and declare members that will be modified while interfacing with your model.
 
 ```
-type SwimTruckSales <: Model
+type SwimTrunkSalesModel <: Model
     price::Float64
-    color::Int  # [1, 4] for simplicity, there are 4 colors of fabiric we can use
-    
-    num_customers::Int
-    
-    SwimTruckSales(price = 16, color = 1) = new(price, color, 0)
+    color::Int
+
+    num_customers
+
+    SwimTrunkSalesModel(price = 16, color = 1) = new(price, color, 0)
 end
 ```
 
@@ -36,10 +36,10 @@ setparam(:SwimTrunkSales, [:price, 7], [:color, :red])
 Unicorn will execute your model by invoking `runmodel(mdl::Model)`, so we need to write a `runmodel(mdl::SwimTrunkSales)`
 
 ```
-function runmodel(mdl::SwimTrunkSales)
+function runmodel(mdl::SwimTrunkSalesModel)
     mdl.num_customers = cos(mdl.price / 12) * 64
     mdl.num_customers *= mdl.color / 2.5
-    
+
     mdl.num_customers
 end
 ```
@@ -51,14 +51,14 @@ Now that we're able to run our model and get results, we should turn our attenti
 
 ```
 # for each run, let's save our decisions and results
-function runmodel(mdl::SwimTrunkSales)
-    push!(:SwimTruckSales, :price)
-    push!(:SwimTruckSales, :color)
+function runmodel(mdl::SwimTrunkSalesModel)
+    push!(:SwimTrunkSalesModel, :price)
+    push!(:SwimTrunkSalesModel, :color)
 
     mdl.num_customers = cos(mdl.price / 12) * 64
     mdl.num_customers *= mdl.color / 2.5
-    push!(:SwimTrunkSales, :num_customers)
-    
+    push!(:SwimTrunkSalesModel, :num_customers)
+
     mdl.num_customers
 end
 ```
