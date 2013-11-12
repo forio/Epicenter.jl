@@ -127,7 +127,3 @@ registered_models()
 # get the model registered for a symbol => Model
 getmodel(model::Symbol)
 ```
-
-```
-
-```
