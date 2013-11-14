@@ -1,37 +1,50 @@
-
 module MiniDa
+
 
 using Mercutio
 
-import Mercutio.runmodel
+export minida,
 
-
-type CalcModel <: Model
-    price::Float64  # in range [0, typemax(Float64)]
-    formula::Int    # in range [1, 4]
-end
-
-function runmodel(mdl::CalcModel)
-    push!(:CalcModel, :price)
-    push!(:CalcModel, :formula)
-
-    num_customers = cos(mdl.price / 12) * 64
-    num_customers *= mdl.formula / 2.5
-end
-
-register_model(CalcModel(7.0, 3))
+       runmodel,
+       forecast
 
 # -------
 
-type ForecastModel <: Model
+type ForecastData
     region::Int  # in range [1, 4]
+
+    likely_customers
+
+    ForecastData(region = 2) = new(region, 0)
 end
 
-function runmodel(mdl::ForecastModel)
-    likely_customers = (mdl.region / 2.5) * 64
+# -------
+
+type MiniDaModel <: Model
+    price::Float64  # in range [0, typemax(Float64)]
+    formula::Int    # in range [1, 4]
+
+    num_customers
+
+    forecast_data::ForecastData
+
+    MiniDaModel(price = 7.0, formula = 2, forecast_data = ForecastData()) = new(price, formula, 0, forecast_data)
 end
 
-register_model(ForecastModel(2))
+minida = MiniDaModel()
 
+# -------
+
+function runmodel()
+    minida.num_customers = cos(minida.price / 12) * 64
+    minida.num_customers *= minida.formula / 2.5
+
+    minida.num_customers
 end
 
+function forecast()
+    minida.forecast_data.likely_customers = (minida.forecast_data.region / 2.5) * 64
+end
+
+
+end
