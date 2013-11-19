@@ -1,110 +1,70 @@
 
 # -------
 
-function isempty(mdl_data::ModelData)
-    for (sym, queue) in mdl_data.persist_queue
-        !isempty(queue) && return false
+type SymbolNode
+    sym
+    parent::SymbolNode
+    children::Array{SymbolNode}
+
+    SymbolNode(sym, parent) = new(sym, parent, SymbolNode[])
+end
+
+global _g_records = Array{SymbolNode}
+
+
+# function getindex(h::SymbolNode, key...)
+# end
+
+
+# function setindex!(h::SymbolNode, key...)
+# end
+
+
+# function haskey(h::SymbolNode, key)
+# end
+
+
+# function get(h::SymbolNode, key, default)
+# end
+
+
+# function getkey(h::SymbolNode, key, default)
+# end
+
+
+# function delete!(h::SymbolNode)
+# end
+
+# -------
+
+function to_expr(syms...)
+    # there might well be a better way to do this, for now we'll eval strings
+    typeof(syms[1]) <: Symbol || error("first piece of key must be a Symbol")
+
+    ex = string(syms[1])
+    for sym in syms[2:end]
+        symtype = typeof(sym)
+        if symtype <: Symbol
+            ex *= ".$sym"
+        elseif symtype <: Int
+            ex *= "[$sym]"
+        elseif symtype <: String
+            ex *= "[$(repr(sym))]"
+        else
+            error("unrecognized key index: $sym")
+        end
     end
 
-    true
+    parse(ex)
 end
 
-function isempty(mdl_data::ModelData, member::Symbol)
-    isempty(mdl_data.persist_queue[member])
-end
+# -------
 
-isempty(mdl_sym::Symbol, member::Symbol) = isempty(getmodeldata(mdl_sym), member)
-
-isempty(mdl_sym::Symbol) = isempty(getmodeldata(mdl_sym))
-
-
-function length(mdl_data::ModelData, member::Symbol)
-    length(mdl_data.persist_queue[member])
-end
-
-length(mdl_sym::Symbol, member::Symbol) = length(getmodeldata(mdl_sym), member)
-
-length(mdl_data::ModelData) = sum(length, mdl_data.persist_queue)
-
-length(mdl_sym::Symbol) = length(getmodeldata(mdl_sym))
-
-
-function empty!(mdl_data::ModelData, member::Symbol)
-    empty!(mdl_data.persist_queue[member])
-end
-
-function empty!(mdl_sym::Symbol, member::Symbol)
-    mdl_data = getmodeldata(mdl_sym)
-    empty!(mdl_data, member)
-end
-
-function empty!(mdl_data::ModelData)
-    for (sym, queue) in mdl_data.persist_queue
-        empty!(queue)
-    end
-
-    mdl_data
-end
-
-empty!(mdl_sym::Symbol) = empty!(getmodeldata(mdl_sym))
-
-
-function push!(mdl_data::ModelData, member::Symbol)
-    if !haskey(mdl_data.persist_queue, member)
-        mdl_data.persist_queue[member] = Any[]
-    end
-
-    val = mdl_data.mdl.(member)
-    push!(mdl_data.persist_queue[member], val)
-end
-
-function push!(mdl_sym::Symbol, member::Symbol)
-    mdl_data = getmodeldata(mdl_sym)
-    push!(mdl_data, member)
+function fetch_records()
 end
 
 
-function pop!(mdl_data::ModelData)
-    for (sym, queue) in mdl_data.persist_queue
-        !isempty(queue) && return [sym, pop!(queue)]
-    end
-
-    error("model queue is empty")
-end
-
-function pop!(mdl_data::ModelData, member::Symbol)
-    pop!(mdl_data.persist_queue[member])
-end
-
-function pop!(mdl_sym::Symbol, member::Symbol)
-    mdl_data = getmodeldata(mdl_sym)
-    pop!(mdl_data, member)
-end
-
-pop!(mdl_sym::Symbol) = pop!(getmodeldata(mdl_sym))
-
-
-function popall!(mdl_data::ModelData)
-    out = deepcopy(mdl_data.persist_queue)
-    empty!(mdl_data.persist_queue)
-
-    out
-end
-
-function popall!()
-    { mdl_sym => deepcopy(mdl_data.persist_queue) for (mdl_sym, mdl_data) in _g_model_data }
-end
-
-popall!(mdl_sym::Symbol) = popall!(getmodeldata(mdl_sym))
-
-
-function splice!(mdl_data::ModelData, member::Symbol, ir, ins::AbstractArray = Base._default_splice)
-    splice!(mdl_data.persist_queue[member], ir, ins)
-end
-
-function splice!(mdl_sym::Symbol, member::Symbol, ir, ins::AbstractArray = Base._default_splice)
-    mdl_data = getmodeldata(mdl_sym)
-    splice!(mdl_data, member, ir, ins)
+function take_records()
 end
 
 # -------
