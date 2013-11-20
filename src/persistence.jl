@@ -24,10 +24,12 @@ function setindex!(h::SymbolNode, keys...)
     key_count = length(keys)
     key_count > 0 || return
 
-    curr_index = 1
-    curr_node = h
+    @assert h.sym == keys[1] "head symbol node does not match key $(keys[1])"
 
-    error("haven't finished setindex")
+    curr_node = h
+    for i in 2:length(keys)
+        curr_node = push!(curr_node, keys[i])
+    end
 end
 
 
@@ -94,14 +96,25 @@ function to_expr(syms...)
     parse(ex)
 end
 
-function find_child_index(n::SymbolNode, k)
-    isempty(n.children) && return -1
+function find_child_index(sn::SymbolNode, child_sym)
+    isempty(sn.children) && return -1
 
-    for i in 1:length(n.children)
-        k == n.children[i].sym && return i
+    for i in 1:length(sn.children)
+        child_sym == sn.children[i].sym && return i
     end
 
     return -1
+end
+
+function push!(sn::SymbolNode, child_sym)
+    child = find_child(sn, child_sym)
+
+    if child == nothing
+        child = SymbolNode(child_sym, sn)
+        push!(sn.children, child)
+    end
+
+    child
 end
 
 find_child(n::SymbolNode, k) = get(n.children, find_child_index(n, k), nothing)
