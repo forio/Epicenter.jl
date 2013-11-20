@@ -64,6 +64,15 @@ end
 # function delete!(h::SymbolNode)
 # end
 
+function show(io::IO, sn::SymbolNode, depth = 1)
+    println(io, ">", sn.sym)
+    for child in sn.children
+        print("  "^depth)
+        show(io, child, depth + 1)
+    end
+    println("  "^(depth - 1), "<")
+end
+
 # -------
 
 function fetch_records()
