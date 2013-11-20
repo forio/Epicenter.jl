@@ -3,7 +3,7 @@
 
 type SymbolNode
     sym
-    paren
+    parent
     children::Array{SymbolNode}
 
     SymbolNode(sym, parent = nothing) = new(sym, parent, SymbolNode[])
@@ -13,32 +13,32 @@ global _g_records = Array{SymbolNode}
 
 # -------
 
-function getindex(h::SymbolNode, keys...)
-    haskey(h, keys) || error("Key not found: $(keys...)")
+function getindex(sn::SymbolNode, keys...)
+    haskey(sn, keys) || error("Key not found: $(keys...)")
 
     eval(Main, to_expr(keys...))
 end
 
 
-function setindex!(h::SymbolNode, keys...)
+function setindex!(sn::SymbolNode, keys...)
     key_count = length(keys)
     key_count > 0 || return
 
-    @assert h.sym == keys[1] "head symbol node does not match key $(keys[1])"
+    sn.sym != keys[1] && error("head symbol node does not match key $(keys[1])")
 
-    curr_node = h
+    curr_node = sn
     for i in 2:length(keys)
         curr_node = push!(curr_node, keys[i])
     end
 end
 
 
-function haskey(h::SymbolNode, keys::Tuple)
+function haskey(sn::SymbolNode, keys::Tuple)
     key_count = length(keys)
     key_count > 0 || return
 
     curr_index = 1
-    curr_node = h
+    curr_node = sn
 
     while curr_index <= key_count && curr_node != nothing && curr_node.sym == keys[curr_index]
         if curr_index == key_count
@@ -63,8 +63,43 @@ haskey(h::SymbolNode, key) = haskey(h, (key,))
 # end
 
 
-# function delete!(h::SymbolNode)
-# end
+function delete!(sn::SymbolNode, keys...)
+    key_count = length(keys)
+
+    key_count == 0 && return sn
+
+    if key_count == 1
+        return sn.sym == keys[1] ? nothing : sn
+    end
+
+    curr_index = 1
+    curr_node = sn
+
+    while curr_index <= key_count && curr_node != nothing && curr_node.sym == keys[curr_index]
+        if curr_index == key_count
+            delete!(curr_node)
+            return sn
+        end
+
+        curr_index += 1
+        curr_node = find_child(curr_node, keys[curr_index])
+    end
+
+    sn
+end
+
+function delete!(sn::SymbolNode)
+    parent = sn.parent
+    parent == nothing && return nothing
+
+    index = find_child_index(parent, sn.sym)
+    index == -1 && error("nodes parent does not contain node... something has gone horribly wrong")
+
+    splice!(parent.children, index)
+
+    nothing
+end
+
 
 function show(io::IO, sn::SymbolNode, depth = 1)
     println(io, ">", sn.sym)
