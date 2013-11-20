@@ -55,12 +55,16 @@ end
 haskey(h::SymbolNode, key) = haskey(h, (key,))
 
 
-# function get(h::SymbolNode, key, default)
-# end
+function push!(sn::SymbolNode, child_sym)
+    child = find_child(sn, child_sym)
 
+    if child == nothing
+        child = SymbolNode(child_sym, sn)
+        push!(sn.children, child)
+    end
 
-# function getkey(h::SymbolNode, key, default)
-# end
+    child
+end
 
 
 function delete!(sn::SymbolNode, keys...)
@@ -142,6 +146,7 @@ function to_expr(syms...)
     parse(ex)
 end
 
+
 function find_child_index(sn::SymbolNode, child_sym)
     isempty(sn.children) && return -1
 
@@ -150,17 +155,6 @@ function find_child_index(sn::SymbolNode, child_sym)
     end
 
     return -1
-end
-
-function push!(sn::SymbolNode, child_sym)
-    child = find_child(sn, child_sym)
-
-    if child == nothing
-        child = SymbolNode(child_sym, sn)
-        push!(sn.children, child)
-    end
-
-    child
 end
 
 find_child(n::SymbolNode, k) = get(n.children, find_child_index(n, k), nothing)
