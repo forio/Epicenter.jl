@@ -21,7 +21,7 @@ push!(child1.children, child2)
 
 # -------
 
-@assert haskey(head, (:testmodel,))
+@assert haskey(head, :testmodel)
 @assert haskey(head, (:testmodel, :member1))
 @assert haskey(head, (:testmodel, :member1, "string_key"))
 

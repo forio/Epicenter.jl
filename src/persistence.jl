@@ -52,6 +52,8 @@ function haskey(h::SymbolNode, keys::Tuple)
     false
 end
 
+haskey(h::SymbolNode, key) = haskey(h, (key,))
+
 
 # function get(h::SymbolNode, key, default)
 # end
