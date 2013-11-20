@@ -3,25 +3,29 @@
 require(dirname(@__FILE__) * "/../src/Mercutio.jl")
 using Mercutio
 
-type Thing
-    bar
+type TestThing
+    member1
 end
 
-foo = Thing({"a"=>78})
+# test data
+testmodel = TestThing({ "string_key" => 69 })
 
-head = SymbolNode(:foo, nothing)
-child1 = SymbolNode(:bar, head)
+# test symbol tree
+head = SymbolNode(:testmodel, nothing)
+
+child1 = SymbolNode(:member1, head)
 push!(head.children, child1)
-child2 = SymbolNode("a", child1)
+
+child2 = SymbolNode("string_key", child1)
 push!(child1.children, child2)
 
-@assert haskey(head, (:foo,))
-@assert haskey(head, (:foo, :bar))
-@assert haskey(head, (:foo, :bar, "a"))
+# -------
 
-@assert !haskey(head, (:foo, :bar, "a", "does_not_exist"))
+@assert haskey(head, (:testmodel,))
+@assert haskey(head, (:testmodel, :member1))
+@assert haskey(head, (:testmodel, :member1, "string_key"))
 
-@assert getindex(head, :foo) != nothing
-@assert getindex(head, :foo, :bar, "a") == 78
+@assert !haskey(head, (:testmodel, :member1, "string_key", "does_not_exist"))
 
-
+@assert getindex(head, :testmodel) != nothing
+@assert getindex(head, :testmodel, :member1, "string_key") == 69
