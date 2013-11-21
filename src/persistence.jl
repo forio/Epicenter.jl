@@ -140,7 +140,6 @@ function hasrecord(keys...)
         global _g_records
 
         sub_head = find_child(_g_records, keys[1])
-        println("sub_head: ", sub_head)
         if sub_head != nothing
             return haskey(sub_head, keys...)
         end
