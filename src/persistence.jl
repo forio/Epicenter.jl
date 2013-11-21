@@ -56,7 +56,7 @@ function haskey(sn::SymbolNode, keys...)
     curr_node = sn
 
     while curr_index <= key_count && curr_node != nothing && curr_node.sym == keys[curr_index]
-        if curr_index == key_count
+        if curr_index == key_count || length(curr_node.children) < 1
             return true
         end
 
