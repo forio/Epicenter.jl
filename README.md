@@ -6,7 +6,7 @@ Don't let him near Tybalt, they have a history.
 
 #### Create a Model
 
-Inherit from the abstract `Mercutio.Model` type and declare members that will be modified while interfacing with your model.
+Inherit from the abstract `Unicorn.Model` type and declare members that will be modified while interfacing with your model.
 
 ```julia
 type SwimTrunkSalesModel <: Model
@@ -19,10 +19,10 @@ type SwimTrunkSalesModel <: Model
 end
 ```
 
-In this case we're trying to figure out how well our swim trucks will sell. We've got a model with two data members that we can play with, `price` and `color`. We've also got a member `num_customers`, which we will calculate. To start using our model, let's resiter it with Mercutio.
+In this case we're trying to figure out how well our swim trucks will sell. We've got a model with two data members that we can play with, `price` and `color`. We've also got a member `num_customers`, which we will calculate. To start using our model, let's resiter it with Unicorn.
 
 ```julia
-julia> using Mercutio
+julia> using Unicorn
 
 julia> register_model(SwimTruckSales())
 
