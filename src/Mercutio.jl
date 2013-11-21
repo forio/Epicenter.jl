@@ -12,9 +12,6 @@ export setparam,
        fetch_records,
        take_records
 
-export SymbolNode,
-       _g_records
-
 include("model.jl")
 include("persistence.jl")
 
