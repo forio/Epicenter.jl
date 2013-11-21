@@ -9,12 +9,12 @@ type SymbolNode
     SymbolNode(sym, parent = nothing) = new(sym, parent, SymbolNode[])
 end
 
-global _g_records = Array{SymbolNode}
+global _g_records = SymbolNode(nothing, nothing)
 
 # -------
 
 function getindex(sn::SymbolNode, keys...)
-    haskey(sn, keys) || error("Key not found: $(keys...)")
+    haskey(sn, keys...) || error("Key not found: $(keys)")
 
     eval(Main, to_expr(keys...))
 end
@@ -33,7 +33,7 @@ function setindex!(sn::SymbolNode, keys...)
 end
 
 
-function haskey(sn::SymbolNode, keys::Tuple)
+function haskey(sn::SymbolNode, keys...)
     key_count = length(keys)
     key_count > 0 || return
 
@@ -51,8 +51,6 @@ function haskey(sn::SymbolNode, keys::Tuple)
 
     false
 end
-
-haskey(h::SymbolNode, key) = haskey(h, (key,))
 
 
 function push!(sn::SymbolNode, child_sym)
@@ -101,7 +99,7 @@ function delete!(sn::SymbolNode)
 
     splice!(parent.children, index)
 
-    nothing
+    parent
 end
 
 
@@ -116,11 +114,52 @@ end
 
 # -------
 
+function record(keys...)
+    length(keys) < 1 && return
+
+    global _g_records
+    sub_head = push!(_g_records, keys[1])
+
+    setindex!(sub_head, keys...)
+end
+
 function fetch_records()
+    build_record_tree()
 end
 
 
 function take_records()
+    tree = build_record_tree()
+    global _g_records = delete!(_g_records)
+
+    tree
+end
+
+function hasrecord(keys...)
+    if length(keys) > 0
+        global _g_records
+
+        sub_head = find_child(_g_records, keys[1])
+        println("sub_head: ", sub_head)
+        if sub_head != nothing
+            return haskey(sub_head, keys...)
+        end
+    end
+
+    false
+end
+
+function getrecord(keys...)
+    if length(keys) > 0
+        global _g_records
+
+        sub_head = find_child(_g_records, keys[1])
+        if sub_head != nothing
+            return getindex(sub_head, keys...)
+        end
+    end
+
+    error("Key not found: $(keys)")
 end
 
 # -------
@@ -158,5 +197,25 @@ function find_child_index(sn::SymbolNode, child_sym)
 end
 
 find_child(n::SymbolNode, k) = get(n.children, find_child_index(n, k), nothing)
+
+
+function build_record_tree(sn::SymbolNode = _g_records, out = Dict(), keys = Any[])
+    keys = deepcopy(keys)
+    push!(keys, sn.sym)
+
+    num_children = length(sn.children)
+    if num_children == 0
+        try
+            out[keys] = eval(Main, to_expr(keys...))
+        catch
+        end
+    else
+        for i in 1:num_children
+            build_record_tree(sn.children[i], out, keys)
+        end
+    end
+
+    out
+end
 
 # -------
