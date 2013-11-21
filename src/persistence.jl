@@ -24,11 +24,22 @@ function setindex!(sn::SymbolNode, keys...)
     key_count = length(keys)
     key_count > 0 || return
 
+    did_allocate = false
+
+    if sn.sym == nothing
+        (sn, did_allocate) = push!(sn, keys[1])
+    end
     sn.sym != keys[1] && error("head symbol node does not match key $(keys[1])")
 
     curr_node = sn
     for i in 2:length(keys)
-        curr_node = push!(curr_node, keys[i])
+        # if a node higher in the tree was already a leaf
+        # then this set of keys is already recorded
+        if !did_allocate && length(curr_node.children) < 1
+            break
+        end
+
+        (curr_node, did_allocate) = push!(curr_node, keys[i])
     end
 
     empty!(curr_node.children)
@@ -60,12 +71,15 @@ end
 function push!(sn::SymbolNode, child_sym)
     child = find_child(sn, child_sym)
 
+    did_allocate = false
+
     if child == nothing
+        did_allocate = true
         child = SymbolNode(child_sym, sn)
         push!(sn.children, child)
     end
 
-    child
+    child, did_allocate
 end
 
 
@@ -123,12 +137,8 @@ end
 # -------
 
 function record(keys...)
-    length(keys) < 1 && return
-
     global _g_records
-    sub_head = push!(_g_records, keys[1])
-
-    setindex!(sub_head, keys...)
+    setindex!(_g_records, keys...)
 end
 
 function fetch_records()
