@@ -96,7 +96,11 @@ end
 
 function delete!(sn::SymbolNode)
     parent = sn.parent
-    parent == nothing && return nothing
+
+    if parent == nothing
+        empty!(sn.children)
+        return sn
+    end
 
     index = find_child_index(parent, sn.sym)
     index == -1 && error("nodes parent does not contain node... something has gone horribly wrong")
@@ -134,7 +138,7 @@ end
 
 function take_records()
     tree = build_record_tree()
-    global _g_records = delete!(_g_records)
+    delete!(_g_records)
 
     tree
 end
@@ -204,17 +208,20 @@ find_child(n::SymbolNode, k) = get(n.children, find_child_index(n, k), nothing)
 
 function build_record_tree(sn::SymbolNode = _g_records, out = Dict(), keys = Any[])
     keys = deepcopy(keys)
-    push!(keys, sn.sym)
+    sn.sym != nothing && push!(keys, sn.sym)  # special case for _g_records
 
-    num_children = length(sn.children)
-    if num_children == 0
-        try
-            out[keys] = eval(Main, to_expr(keys...))
-        catch
-        end
-    else
-        for i in 1:num_children
-            build_record_tree(sn.children[i], out, keys)
+    for child in sn.children
+        num_grandchildren = length(child.children)
+
+        if num_grandchildren > 0
+            out[child.sym] = Dict()
+            build_record_tree(child, out[child.sym], keys)
+        else
+            try
+                out[child.sym] = eval(Main, to_expr(keys..., child.sym))
+            catch err
+                out[child.sym] = err
+            end
         end
     end
 
