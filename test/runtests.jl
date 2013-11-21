@@ -22,7 +22,7 @@ record(:testmodel)
 @assert hasrecord(:testmodel, :member1)
 @assert hasrecord(:testmodel, :member1, "string_key")
 
-#@assert hasrecord(:testmodel, :member1, "string_key", "does_not_exist")
+#@assert !hasrecord(:testmodel, :member1, "string_key", "does_not_exist")
 
 @assert getrecord(:testmodel) != nothing
 @assert getrecord(:testmodel, :member1, "string_key") == 69
