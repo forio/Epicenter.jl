@@ -30,6 +30,10 @@ function setindex!(sn::SymbolNode, keys...)
     for i in 2:length(keys)
         curr_node = push!(curr_node, keys[i])
     end
+
+    empty!(curr_node.children)
+
+    nothing
 end
 
 
