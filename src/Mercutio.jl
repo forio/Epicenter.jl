@@ -5,12 +5,12 @@ importall Base
 
 export Model
 
-export register_model,
-       registered_models,
-       getmodel,
-       runmodel,
-       setparam,
-       popall!
+export setparam,
+       record,
+       hasrecord,
+       getrecord,
+       fetch_records,
+       take_records
 
 include("model.jl")
 include("persistence.jl")
