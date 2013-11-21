@@ -3,8 +3,6 @@ module Mercutio
 
 importall Base
 
-export Model
-
 export setparam,
        record,
        hasrecord,
