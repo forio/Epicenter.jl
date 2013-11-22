@@ -1,8 +1,9 @@
 module MiniDa
 
-using Mercutio
+using Unicorn
 
 export minida,
+       curr_year,
 
        runmodel,
        forecast
@@ -25,7 +26,7 @@ type MiniDaModel
     forecast_data::ForecastData
     forecast_results::Dict
 
-    MiniDaModel(price = 7.0, formula = 2, forecast_data = ForecastData()) = new(price, formula, Anyp[], forecast_data, Any[])
+    MiniDaModel(price = 7.0, formula = 2, forecast_data = ForecastData()) = new(price, formula, Any[], forecast_data, Dict())
 end
 
 const minida = MiniDaModel()
@@ -33,6 +34,7 @@ const minida = MiniDaModel()
 # -------
 
 global curr_year = 2013
+record(:curr_year)
 
 # -------
 
@@ -40,9 +42,11 @@ function runmodel()
     num_customers = cos(minida.price / 12) * 64
     num_customers *= minida.formula / 2.5
 
-    push!(minida.run_results, num_customers)
-
     global curr_year += 1
+    record(:curr_year)
+
+    push!(minida.run_results, num_customers)
+    record(:minida, :run_results, length(minida.run_results))
 
     num_customers
 end
@@ -50,7 +54,8 @@ end
 function forecast()
     likely_customers = (minida.forecast_data.region / 2.5) * 64
 
-    minida.forecast_data[curr_year] = likely_customers
+    minida.forecast_results[curr_year] = likely_customers
+    record(:minida, :forecast_results, curr_year)
 
     likely_customers
 end
