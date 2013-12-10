@@ -1,7 +1,6 @@
 
-
-require(dirname(@__FILE__) * "/../src/Mercutio.jl")
-using Mercutio
+require(dirname(@__FILE__) * "/../src/Unicorn.jl")
+using Unicorn
 
 type TestThing
     member1
