@@ -9,7 +9,7 @@ julia> Pkg.clone("https://github.com/forio/Unicorn.jl.git")
 
 ### Create a Model
 
-Your model does not have to be a structure of a particular type and can include multiple disperate Modules, global variables, and any data structures you may use.
+Your model does not have to be a structure of a particular type and can include multiple disparate Modules, global variables, and any data structures you may use.
 
 ```julia
 module MiniDa
