@@ -7,7 +7,7 @@ julia> Pkg.clone("https://github.com/forio/Unicorn.jl.git")
 ```
 
 
-#### Create a Model
+### Create a Model
 
 Your model does not have to be a structure of a particular type and can include multiple disperate Modules, global variables, and any data structures you may use.
 
@@ -75,7 +75,7 @@ end
 
 In this case we've defined everything in one module called `MiniDa`. We've got a global instance of `MiniDaModel` called `minida` which contains information about run and forecast results, along with a globl `curr_year`. Also notice that we have `runmodel` and `forecast` which do some simple calculations and store the results.
 
-#### Set parameters and run the model
+### Set parameters and run the model
 
 We can mess around a little using the `Unicorn.jl` interface and our knowledge of the model.
 
@@ -100,7 +100,7 @@ julia> MiniDa.runmodel()
 42.73312050338084
 ```
 
-#### Persist decisions and results
+### Persist decisions and results
 
 Now that we're able to run our model and get results, we should turn our attention to persisting data so that we can look back later. The method we'll use to do this is `record(keys...)`, which we can call anywhere in the model. `keys` will be a set of symbols and indexes that we will use to keep track of persisted values.
 
