@@ -73,7 +73,7 @@ end
 end
 ```
 
-In this case we've defined everything in one module called `MiniDa`. We've got a global instance of `MiniDaModel` called `minida` which contains information about run and forecast results, along with a globl `curr_year`. Also notice that we have `runmodel` and `forecast` which do some simple calculations and store the results.
+In this case we've defined everything in one module called `MiniDa`. We've got a global instance of `MiniDaModel` called `minida` which contains information about run and forecast results, along with a global `curr_year`. Also notice that we have `runmodel` and `forecast` which do some simple calculations and store the results.
 
 ### Set parameters and run the model
 
