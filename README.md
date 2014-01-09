@@ -79,7 +79,7 @@ In this case we've defined everything in one module called `MiniDa`. We've got a
 
 We can mess around a little using the `Unicorn.jl` interface and our knowledge of the model.
 
-```
+```julia
 julia> using Unicorn
 
 julia> require("MiniDa.jl")
@@ -131,3 +131,4 @@ function forecast()
     likely_customers
 end
 ```
+
