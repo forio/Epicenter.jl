@@ -1,129 +1,133 @@
 ## A package for writing models and simulations
 
-Don't let him near Tybalt, they have a history.
+### Quickstart
 
-### Usage
+```julia
+julia> Pkg.clone("https://github.com/forio/Unicorn.jl.git")
+```
+
 
 #### Create a Model
 
-Inherit from the abstract `Unicorn.Model` type and declare members that will be modified while interfacing with your model.
+Your model does not have to be a structure of a particular type and can include multiple disperate Modules, global variables, and any data structures you may use.
 
 ```julia
-type SwimTrunkSalesModel <: Model
-    price::Float64
-    color::Int  # [1, 4] for simplicity, there are 4 colors of fabric
+module MiniDa
+
+using Unicorn
+
+export minida,
+       curr_year,
+
+       runmodel,
+       forecast
+
+# -------
+
+type ForecastData
+    region::Int  # in range [1, 4]
+
+    ForecastData(region = 2) = new(region)
+end
+
+# -------
+
+type MiniDaModel
+    price::Float64  # in range [0, typemax(Float64)]
+    formula::Int    # in range [1, 4]
+    run_results::Array
+
+    forecast_data::ForecastData
+    forecast_results::Dict
+
+    MiniDaModel(price = 7.0, formula = 2, forecast_data = ForecastData()) = new(price, formula, Any[], forecast_data, Dict())
+end
+
+const minida = MiniDaModel()
+
+# -------
+
+global curr_year = 2013
+
+# -------
+
+function runmodel()
+    num_customers = cos(minida.price / 12) * 64
+    num_customers *= minida.formula / 2.5
+
+    global curr_year += 1
+
+    push!(minida.run_results, num_customers)
 
     num_customers
+end
 
-    SwimTrunkSalesModel(price = 16.0, color = 1) = new(price, color, 0)
+function forecast()
+    likely_customers = (minida.forecast_data.region / 2.5) * 64
+    
+    minida.forecast_results[curr_year] = likely_customers    
+    
+    likely_customers
+end
+
 end
 ```
 
-In this case we're trying to figure out how well our swim trucks will sell. We've got a model with two data members that we can play with, `price` and `color`. We've also got a member `num_customers`, which we will calculate. To start using our model, let's resiter it with Unicorn.
+In this case we've defined everything in one module called `MiniDa`. We've got a global instance of `MiniDaModel` called `minida` which contains information about run and forecast results, along with a globl `curr_year`. Also notice that we have `runmodel` and `forecast` which do some simple calculations and store the results.
 
-```julia
+#### Set parameters and run the model
+
+We can mess around a little using the `Unicorn.jl` interface and our knowledge of the model.
+
+```
 julia> using Unicorn
 
-julia> register_model(SwimTruckSales())
+julia> require("MiniDa.jl")
 
-# now we can do cool things like change price and color
-julia> setparam(:SwimTrunkSales, [:price, 7], [:color, 3])
+julia> curr_year
+2013
+
+# it's no longer 2013, let's use `setparam` to update that
+
+julia> julia> setparam([:curr_year, 2014])
+
+julia> curr_year
+2014
+
+# we can also run the model to see what we get
+
+julia> MiniDa.runmodel()
+42.73312050338084
 ```
-
-
-#### Implement `runmodel`
-
-Unicorn will execute your model by invoking `runmodel(mdl::Model)`, so we need to write a `runmodel(mdl::SwimTrunkSales)`
-
-```julia
-function runmodel(mdl::SwimTrunkSalesModel)
-    mdl.num_customers = cos(mdl.price / 12) * 64
-    mdl.num_customers *= mdl.color / 2.5
-
-    mdl.num_customers
-end
-```
-
 
 #### Persist decisions and results
 
-Now that we're able to run our model and get results, we should turn our attention to persisting data so that we can look back at our results. The method we'll use to do this is `push!(:MdlDataType, :member)`, which we can call inside of `runmodel`.
+Now that we're able to run our model and get results, we should turn our attention to persisting data so that we can look back later. The method we'll use to do this is `record(keys...)`, which we can call anywhere in the model. `keys` will be a set of symbols and indexes that we will use to keep track of persisted values.
 
 ```julia
-# for each run, let's save our decisions and results
-function runmodel(mdl::SwimTrunkSalesModel)
-    push!(:SwimTrunkSalesModel, :price)
-    push!(:SwimTrunkSalesModel, :color)
+function runmodel()
+    num_customers = cos(minida.price / 12) * 64
+    num_customers *= minida.formula / 2.5
 
-    mdl.num_customers = cos(mdl.price / 12) * 64
-    mdl.num_customers *= mdl.color / 2.5
-    push!(:SwimTrunkSalesModel, :num_customers)
+    global curr_year += 1
+    record(:curr_year)  # add this call to record the global :curr_year value
 
-    mdl.num_customers
+    push!(minida.run_results, num_customers)
+    
+    # let's also record the array of stored run_results whenever we add a new one
+    record(:minida, :run_results, length(minida.run_results))
+
+    num_customers
 end
-```
 
-```julia
-# now we can run our model, change our decisions, and try again
-julia> runmodel(:SwimTrunkSalesModel)
-6.02208187655653
+function forecast()
+    likely_customers = (minida.forecast_data.region / 2.5) * 64
 
-julia> setparam(:SwimTrunkSalesModel, [:price, 2.0])
+    minida.forecast_results[curr_year] = likely_customers
+    
+    # we should also tell Unicorn that we've updated `forecast_results` whenever we change it
+    record(:minida, :forecast_results, curr_year)
 
-julia> runmodel(:SwimTrunkSalesModel)
-25.245266728010883
-
-```
-
-
-#### Access persisted values
-
-Now that we've run our model a couple times, we've generated some data. The API for accessing it is as follows:
-
-```julia
-# is there data to persist => true | false
-isempty(mdl_sym::Symbol, member::Symbol)
-isempty(mdl_sym::Symbol)
-```
-
-```julia
-# how many values are queued => Int
-length(mdl_sym::Symbol, member::Symbol)
-length(mdl_sym::Symbol)
-```
-
-```julia
-# flush everything from the queue => nothing
-empty!(mdl_sym::Symbol, member::Symbol)
-empty!(mdl_sym::Symbol)
-```
-
-```julia
-# pop a single thing from the queue
-pop!(mdl_sym::Symbol, member::Symbol) # => val
-pop!(mdl_sym::Symbol)                 # => [:member, val]
-```
-
-```julia
-# pop everything from a models queue => { :member1 => [val1, val2]
-#                                         :member2 => [val1, val2, val3] }
-popall!(mdl_sym::Symbol)
-```
-
-```julia
-# splice out an element or a range from a queue
-splice!(mdl_sym::Symbol, member::Symbol, ir, ins::AbstractArray = Base._default_splice)
-```
-
-
-#### Other useful methods
-
-```julia
-# list names of all registered models => [:model1, :model2, :model3]
-registered_models()
-```
-
-```julia
-# get the model registered for a symbol => Model
-getmodel(model::Symbol)
+    likely_customers
+end
 ```
