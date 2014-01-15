@@ -84,7 +84,7 @@ This sample model showcases the Unicorn.jl package and common conventions for wr
 	global start_price = 15
 	global curr_year
 	
-	global const model = ModelType()
+	const model = ModelType()
 	
 	# -------
 
@@ -123,7 +123,7 @@ This sample model showcases the Unicorn.jl package and common conventions for wr
 	end
 	
 	function reset()
-		global model = ModelType()
+		model = ModelType()
 		init()
 	end
 
