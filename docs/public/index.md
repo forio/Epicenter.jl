@@ -27,12 +27,14 @@ Additionally, the Unicorn platform also provides RESTful APIs for creating runs,
 ###Set up your Julia environment
 
 To add Unicorn.jl to your Julia environment, use:
-
-	julia> Pkg.clone("https://github.com/forio/Unicorn.jl.git")
+```julia
+julia> Pkg.clone("https://github.com/forio/Unicorn.jl.git")
+```
 
 Then, at the beginning of your model files, add:
-
-	using Unicorn 
+```julia
+using Unicorn 
+```
 
 *TIP:* Obviously, you can use other packages as well. However, if you'll ultimately be using Forio's Unicorn platform, you'll need to communicate your other packages and dependencies to the Forio Platform team so that they can configure your account on the Unicorn server correctly. (Shortly we'll have a [less manual solution](https://issues.forio.com/browse/UNICORN-82) to this.)
 
@@ -42,93 +44,96 @@ Then, at the beginning of your model files, add:
 
 This sample model showcases the Unicorn.jl package and common conventions for writing models that will be hosted on the Unicorn platform. We'll examine each of the key pieces in the sections below.
 
-	# in myModel.jl
-	module myModel
-	
-	#include the Unicorn.jl package
-	using Unicorn
-	
-	# expose variables to users of your model
-	export 	model,
-			curr_year
-	
-	# expose methods to users of your model
-	export	init,
-			advance,
-			reset
-	
-	# -------
-	
-	type ModelResultsType
-		num_customers::Int
-		revenue::Float64
-	end
+```julia
+# in MyModel.jl
 
-	# constructor for ModelResultsType initializes each element to 0
-	function ModelResultsType(
-				;num_customers=0,
-				revenue=0)
-	end
-	
-	# -------
-	
-	type ModelType
-		price::Float64
-		results_over_time::Array{ModelResultType,1}
-	end
-	
-	# -------
-	
-	global start_year = 2014
-	global initial_customers = 50
-	global start_price = 15
-	global curr_year
-	
-	const model = ModelType()
-	
-	# -------
+module MyModel
 
-	function init()
-		global curr_year = start_year
-		model.price = start_price
-		
-		current_result = ModelResultsType()
-		current_result.num_customers = initial_customers
-		current_result.revenue = (model.price) * (model.results_over_time[1].num_customers)
-		
-		push!(model.results_over_time, current_result)
-		
-		record(:model,:results_over_time,1)
-	end
-	
-	function advance()
-		
-		current_result = ModelResultsType()	
-		current_result.num_customers = cos(model.price / 12) * 64
-		current_result.revenue = (model.price) * (current_result.num_customers)
-		
-		global curr_year +=1
-		
-		# add current_result, the results of executing the model for this time step,
-		# to the end of the model.results array
-		push!(model.results_over_time, current_result)
+#include the Unicorn.jl package
+using Unicorn
 
-		# length(model.results_over_time) is index of the last element of the model.results_over_time array 
-		# so adding model.results[length(model.results)] to the persistence queue
-		# adds only the last element of the array to the persistence queue
-		# when the model runs on the Unicorn platform, 
-		# the Unicorn platform processes this queue approximately every second
-		record(:model, :results, length(model.results))
-		
-	end
-	
-	function reset()
-		model = ModelType()
-		init()
-	end
+# expose variables to users of your model
+export  model,
+        curr_year
 
-	end
+# expose methods to users of your model
+export  init,
+        advance,
+        reset
 
+# -------
+
+type ModelResultType
+    num_customers::Int
+    revenue::Float64
+
+    ModelResultType(; num_customers = 0, revenue = 0) = new(num_customers, revenue)
+end
+
+# -------
+
+type ModelType
+    price::Float64
+    results_over_time::Array{ModelResultType, 1}
+
+    ModelType(; price = start_price) = new(price, ModelResultType[])
+end
+
+# -------
+
+const global start_year = 2014
+const global initial_customers = 50
+const global start_price = 15
+
+global curr_year
+global model
+
+# -------
+
+function init()
+    #! Moved this logic into reset so that ModelType() doesn't get called
+    #  multiple times. Also, doing so makes a bug with recording the
+    #  results_over_time array much easier to intuit (see below)
+    reset()
+end
+
+function advance()
+    global curr_year += 1
+
+    current_result = ModelResultType()
+    current_result.num_customers = int(cos(model.price / 12) * 64)
+    current_result.revenue = model.price * current_result.num_customers
+
+    # add current_result, the results of executing the model for this time step,
+    # to the end of the model.results array
+    push!(model.results_over_time, current_result)
+
+    # length(model.results_over_time) is the index of the last element of
+    # model.results_over_time array so adding model.results[length(model.results)]
+    # to the persistence queue adds only the last element of the array to the
+    # persistence queue when the model runs on the Unicorn platform,
+    # the Unicorn platform processes this queue approximately every second
+    record(:model, :results_over_time, length(model.results_over_time))
+end
+
+function reset()
+    global curr_year = start_year
+    global model = ModelType()
+
+    current_result = ModelResultType()
+    current_result.num_customers = initial_customers
+    current_result.revenue = model.price * current_result.num_customers
+
+    push!(model.results_over_time, current_result)
+
+    #! we want to record the whole array here! If it was full of runs before, Unicorn needs to know
+    #  that they were all cleared and that there's only one result now
+    record(:model, :results_over_time)
+end
+
+end
+
+```
 
 <a id="recommended-conventions-and-practices-for-modeling"></a>
 ###Recommended conventions and practices for modeling
@@ -141,7 +146,7 @@ Your top-level module should have the same name as your top-level file.
 
 **Why.** You'll pass this file as an argument when [creating a run](https://github.com/forio/unicorn/blob/master/docs/public/run/index.md#post-creating-a-new-run-for-this-project) using the Unicorn platform.
 
-**How.** The sample file is called `myModel.jl` and the module is `module myModel`. 
+**How.** The sample file is called `MyModel.jl` and the module is `module MyModel`. 
 
 
 ####Expose variables and methods in this module.
@@ -150,7 +155,7 @@ This top-level file should include your `export` statements for exposing variabl
 
 **Why.** In order for the Unicorn platform to set and read model variables, or execute methods in the model, you need to expose the variables and methods using the Julia keyword `export`. Additionally, all of the `export` statements need to be in one file. The Unicorn platform makes it easy for a web front-end to set and read these variables and execute these methods.
 
-**How.** The sample file `myModel.jl` file includes the lines `export init, reset, advance` and `export model, curr_year`.
+**How.** The sample file `MyModel.jl` file includes the lines `export init, reset, advance` and `export model, curr_year`.
 
 ####Define and expose methods that capture how users should interact with your model. 
 
@@ -175,14 +180,16 @@ Any variables that you want persisted need to be explicitly persisted using Unic
 `record(keys...)` can takes any number of symbols and/or indices that describe the object you want to persist.
 
 In the sample file:
-
-	record(:curr_year)
+```julia
+record(:curr_year)
+```
 
 adds the variable `curr_year` to the persistence queue. This means that the persisted variable `curr_year` will be set to the value of `curr_year` (as soon as the persistence queue is processed, e.g. by the Unicorn platform). *Any previous value of `curr_year` is overwritten once the persistence operation is complete.*
 
 As another example from the sample file:
-
-	record(:model, :results_over_time, length(model.results_over_time))
+```julia
+record(:model, :results_over_time, length(model.results_over_time))
+```
 
 adds the variable `model.results_over_time[length(model.results_over_time)]` to the persistence queue. Again, this means that the persisted variable `model.results_over_time[length(model.results_over_time)]` will be set to the current value of this variable (as soon as the persistence queue is processed, e.g. by the Unicorn platform). 
 
