@@ -107,8 +107,7 @@ function advance()
     # to the end of the model.results array
     push!(model.results_over_time, current_result)
 
-    # length(model.results_over_time) is the index of the last element of
-    # model.results_over_time array. 
+    # length(model.results_over_time) is the index of the last element of the model.results_over_time array. 
     # So adding model.results[length(model.results)] to the persistence queue 
     # adds only the last element of the array to the persistence queue.
     # When the model runs on the Unicorn platform,
