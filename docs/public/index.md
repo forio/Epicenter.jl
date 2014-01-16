@@ -46,10 +46,9 @@ This sample model showcases the Unicorn.jl package and common conventions for wr
 
 ```julia
 # in MyModel.jl
-
 module MyModel
 
-#include the Unicorn.jl package
+# include the Unicorn.jl package
 using Unicorn
 
 # expose variables to users of your model
@@ -91,9 +90,9 @@ global model
 # -------
 
 function init()
-    #! Moved this logic into reset so that ModelType() doesn't get called
-    #  multiple times. Also, doing so makes a bug with recording the
-    #  results_over_time array much easier to intuit (see below)
+    # For this model, init() and reset() end up being identical
+    # We choose to put the logic in reset() so that ModelType() doesn't get called multiple times, 
+    # and it's more clear why we want to record the entire results_over_time array
     reset()
 end
 
@@ -104,14 +103,15 @@ function advance()
     current_result.num_customers = int(cos(model.price / 12) * 64)
     current_result.revenue = model.price * current_result.num_customers
 
-    # add current_result, the results of executing the model for this time step,
+    # Add current_result, the results of executing the model for this time step,
     # to the end of the model.results array
     push!(model.results_over_time, current_result)
 
     # length(model.results_over_time) is the index of the last element of
-    # model.results_over_time array so adding model.results[length(model.results)]
-    # to the persistence queue adds only the last element of the array to the
-    # persistence queue when the model runs on the Unicorn platform,
+    # model.results_over_time array. 
+    # So adding model.results[length(model.results)] to the persistence queue 
+    # adds only the last element of the array to the persistence queue.
+    # When the model runs on the Unicorn platform,
     # the Unicorn platform processes this queue approximately every second
     record(:model, :results_over_time, length(model.results_over_time))
 end
@@ -126,8 +126,8 @@ function reset()
 
     push!(model.results_over_time, current_result)
 
-    #! we want to record the whole array here! If it was full of runs before, Unicorn needs to know
-    #  that they were all cleared and that there's only one result now
+    # Record the entire model.results_over_time array here
+    # to ensure that any existing runs (in later indices) are cleared.
     record(:model, :results_over_time)
 end
 
@@ -167,7 +167,8 @@ This top-level file should include your `export` statements for exposing variabl
 
 * An advance function, that moves the model forward by one time step, persisting any results needed. This is useful for models that simulate the behavior of a system over time. In our example, this is `advance()`. 
 
-* A reset function, that returns the model to a known state &mdash; often the initial state. This is useful for models in which an end user may work through the simulation multiple times at one sitting. In practice, its details may be the same as the initialize function, but its purpose is slightly different. In our example, this is `reset()`.
+* A reset function, that returns the model to a known state &mdash; often the initial state. This is useful for models in which an end user want to clear out the results and start again. In practice, its details may be the same as the initialize function, but its purpose is slightly different. In our example, this is `reset()`. 
+	* Note that this example erases the results when a `reset()` is called. An alternative approach is to have the front-end user interface start a new session when the user wants to reset. This would preserve the existing results while also allowing the user to start again. If you are using the Unicorn platform, you can create a new run (session) with a [POST request to the Run API](https://github.com/forio/unicorn/blob/master/docs/public/run/index.md#post-creating-a-new-run-for-this-project). 
 	
 ####Persist variables in exposed methods.
 
