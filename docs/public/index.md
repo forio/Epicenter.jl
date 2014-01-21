@@ -148,13 +148,13 @@ Your top-level module should have the same name as your top-level file.
 **How.** The sample file is called `MyModel.jl` and the module is `module MyModel`. 
 
 
-####Expose variables and methods in this module.
+####Expose variables and methods in this module, and make the variables global.
 
-This top-level file should include your `export` statements for exposing variables and methods for end users to manipulate. 
+This top-level file should include your `export` statements for exposing methods and global variables for end users to manipulate. 
 
-**Why.** In order for the Unicorn platform to set and read model variables, or execute methods in the model, you need to expose the variables and methods using the Julia keyword `export`. Additionally, all of the `export` statements need to be in one file. The Unicorn platform makes it easy for a web front-end to set and read these variables and execute these methods.
+**Why.** In order for the Unicorn platform to set and read model variables, or execute methods in the model, you need to expose the variables and methods using the Julia keyword `export`. Additionally, all of the `export` statements need to be in one file.  Finally, all of the variables need to be declared as `global`. The Unicorn platform makes it easy for a web front-end to set and read these variables and execute these methods.
 
-**How.** The sample file `MyModel.jl` file includes the lines `export init, reset, advance` and `export model, curr_year`.
+**How.** The sample file `MyModel.jl` file includes the lines `export init, reset, advance` and `export model, curr_year` and declares the `model` and `curr_year` variables as `global`.
 
 ####Define and expose methods that capture how users should interact with your model. 
 
@@ -177,7 +177,7 @@ Any variables that you want persisted need to be explicitly persisted using Unic
 
 **How.** Use the method call `record(keys...)`. When you're running your model on the Unicorn platform, the Unicorn platform processes this queue approximately every second, taking items in the queue and storing them in the Unicorn backend database.
 
-`record(keys...)` can takes any number of symbols and/or indices that describe the object you want to persist.
+`record(keys...)` can take any number of symbols and/or indices that describe the object you want to persist.
 
 In the sample file:
 ```julia
