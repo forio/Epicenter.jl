@@ -12,5 +12,8 @@ export setparam,
 
 include("model.jl")
 include("persistence.jl")
+include("session-settings.jl")
+
+set_idle_timeout(20, 10)
 
 end
