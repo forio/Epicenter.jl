@@ -13,6 +13,11 @@ function refresh_timeout(cid, msgtype, data)
 end
 
 function setup_idle_timeout(timeout, interval = 10)
+    # check for other idle timers
+    if isdefined(:IDLE_TIMER)
+        stop_timer(IDLE_TIMER)
+    end
+
     global IDLE_TIMEOUT = timeout
     global TIME_LAST_MODIFIED = time()
     global IDLE_TIMER = Timer( (t, status) -> begin
