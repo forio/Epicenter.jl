@@ -14,6 +14,7 @@ include("model.jl")
 include("persistence.jl")
 include("session-settings.jl")
 
-setup_idle_timeout(20, 10)
+# default idle timeout to 8 minutes, check every 4 minutes
+setup_idle_timeout(8*60, 4*60)
 
 end
