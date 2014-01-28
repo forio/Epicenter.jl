@@ -32,9 +32,8 @@ function setup_idle_timeout(timeout, interval = 10)
     end)
     start_timer(IDLE_TIMER, interval, interval)
 
-    event_sys = get_system(Event)
-
-    Event.register_handler(event_sys, "networkIn", refresh_timeout)
+    event_sys = Main.Juliet.get_system(Main.Juliet.Event)
+    Main.Juliet.Event.register_handler(event_sys, "networkIn", refresh_timeout)
 end
 
 # -------
