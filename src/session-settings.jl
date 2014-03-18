@@ -1,4 +1,3 @@
-
 # -------
 
 function refresh_timeout(cid, msgtype, data)
@@ -12,7 +11,7 @@ function refresh_timeout(cid, msgtype, data)
     global TIME_LAST_MODIFIED = time()
 end
 
-function setup_idle_timeout(timeout, interval = 120)
+function setup_idle_timeout(timeout, interval = 120.0)
     # check for other idle timers
     if isdefined(:IDLE_TIMER)
         stop_timer(IDLE_TIMER)
@@ -30,7 +29,7 @@ function setup_idle_timeout(timeout, interval = 120)
             exit()
         end
     end)
-    start_timer(IDLE_TIMER, interval, interval)
+    start_timer(IDLE_TIMER, float(interval), float(interval))
 
     event_sys = Main.Juliet.get_system(Main.Juliet.Event)
     Main.Juliet.Event.register_handler(event_sys, "networkIn", refresh_timeout)
