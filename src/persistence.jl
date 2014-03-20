@@ -9,7 +9,15 @@ type SymbolNode
     SymbolNode(sym, parent = nothing) = new(sym, parent, SymbolNode[])
 end
 
+type DataNode
+    name
+    value
+
+    DataNode(name, value) = new(name, value)
+end
+
 global _g_records = SymbolNode(nothing, nothing)
+global _data_records = {}
 
 # -------
 
@@ -82,6 +90,11 @@ function push!(sn::SymbolNode, child_sym)
     child, did_allocate
 end
 
+function storeData(name, value)
+    node = DataNode(name, value)
+    push!(_data_records, node)
+    node
+end
 
 function delete!(sn::SymbolNode, keys...)
     key_count = length(keys)
@@ -150,6 +163,11 @@ function take_records()
     tree = build_record_tree()
     delete!(_g_records)
 
+    for node = _data_records
+        tree[node.name] = node.value
+    end
+    empty!(_data_records)
+    
     tree
 end
 
