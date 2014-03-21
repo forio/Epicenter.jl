@@ -90,7 +90,7 @@ function push!(sn::SymbolNode, child_sym)
     child, did_allocate
 end
 
-function storeData(name, value)
+function store_data(name, value)
     node = DataNode(name, value)
     push!(_data_records, node)
     node
