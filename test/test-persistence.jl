@@ -1,6 +1,6 @@
 
-require(dirname(@__FILE__) * "/../src/Unicorn.jl")
-using Unicorn
+require(dirname(@__FILE__) * "/../src/Epicenter.jl")
+using Epicenter
 
 type TestThing
     member1

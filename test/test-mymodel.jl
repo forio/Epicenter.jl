@@ -9,7 +9,7 @@ init()
 @test MyModel.start_year === 2014
 @test curr_year === MyModel.start_year
 @test length(model.results_over_time) === 1
-@test Unicorn.fetch_records() != {}
+@test Epicenter.fetch_records() != {}
 
 advance()
 @test MyModel.curr_year === 2015
@@ -24,7 +24,7 @@ reset()
 @test MyModel.start_year === 2014
 @test MyModel.curr_year === MyModel.start_year
 @test length(model.results_over_time) === 1
-@test Unicorn.take_records() != {}
+@test Epicenter.take_records() != {}
 
 advance()
 @test MyModel.curr_year === 2015
