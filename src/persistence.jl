@@ -150,13 +150,8 @@ end
 # -------
 
 function record(keys...)
-    try
-        eval(Main, to_expr(keys...))
-        setindex!(_g_records, keys...)
-    catch err
-        identifier = to_expr(keys...)
-        error("Unable to record: $identifier Probably the object you want to record is not accessible from the Main module.")
-    end
+    global _g_records
+    setindex!(_g_records, keys...)
 end
 
 function fetch_records()
@@ -172,7 +167,7 @@ function take_records()
         tree[node.name] = node.value
     end
     empty!(_data_records)
-
+    
     tree
 end
 
