@@ -7,7 +7,8 @@ export setparam,
        hasrecord,
        getrecord,
        fetch_records,
-       take_records
+       take_records,
+       subscribe
 
 include("model.jl")
 include("persistence.jl")
