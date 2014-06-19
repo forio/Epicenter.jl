@@ -28,3 +28,14 @@ reset()
 
 advance()
 @test MyModel.curr_year === 2015
+
+# Test setparam
+@test MyModel.model.price == MyModel.start_price
+Epicenter.setparam([:(model.price), 15.0])
+@test MyModel.model.price == 15.0
+
+Epicenter.setparam([:curr_year, 20])
+@test MyModel.curr_year == 20
+
+Epicenter.setparam([:(dummy.x), 84])
+@test MyModel.dummy.x == 84
