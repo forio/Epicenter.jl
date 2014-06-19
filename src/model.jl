@@ -15,7 +15,7 @@ end
 
 
 global variable_module = nothing
-global mods_seen = Module[Core, Base]
+global mods_seen = Module[Core, Base, current_module()]
 
 function lookup_variables(mod::Module)
 	global variable_module
