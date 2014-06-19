@@ -12,6 +12,8 @@ export  init,
         advance,
         reset
 
+using InnerModule
+
 # -------
 
 type ModelResultType

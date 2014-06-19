@@ -7,6 +7,6 @@ for file in files
     !beginswith(file, "test-") && continue
 
     println("running $file...")
-    !success(`$JULIA_HOME/julia-basic $file`) && error("running test: $file")
+    !success(`julia $file`) && error("running test: $file")
     println("success")
 end
